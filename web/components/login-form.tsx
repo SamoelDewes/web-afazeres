@@ -1,12 +1,8 @@
 "use client";
 
-import * as React from "react";
-import { Input } from "@/components/input";
-import { Button } from "@/components/button";
-
 export function LoginForm() {
   return (
-    <form className="space-y-4">
+    <>
       <div className="space-y-2">
         <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
           E-mail
@@ -35,9 +31,9 @@ export function LoginForm() {
         />
       </div>
 
-      <Button type="submit" variant="primary" size="lg" className="w-full">
+      <button type="submit" className="w-full primary lg">
         Entrar
-      </Button>
-    </form>
+      </button>
+    </>
   );
 }

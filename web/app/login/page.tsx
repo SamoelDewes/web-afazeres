@@ -7,8 +7,9 @@ export const dynamic = "force-dynamic";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: { error?: string };
+  searchParams: Promise<{ error?: string }>;
 }) {
+  const { error: hasError } = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase.auth.getSession();
 
@@ -31,7 +32,7 @@ export default async function LoginPage({
           <p className="text-muted text-sm">Entrar na sua conta</p>
         </div>
 
-        {searchParams.error && (
+        {hasError && (
           <div className="mb-4 p-3 rounded-xl bg-danger-bg border border-danger/20 text-danger text-sm">
             E-mail ou senha incorretos. Tente novamente.
           </div>
