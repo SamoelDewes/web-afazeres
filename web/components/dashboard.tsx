@@ -121,7 +121,7 @@ export function Dashboard({ members, tasks }: DashboardProps) {
       {/* Toast */}
       {toast && (
         <div
-          className={`fixed left-4 right-4 top-16 z-50 mx-auto max-w-sm px-4 py-3 rounded-xl shadow-lg text-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-2 ${
+          className={`fixed left-4 right-4 top-16 z-50 mx-auto max-w-sm px-4 py-3 rounded-xl shadow-lg text-sm font-medium flex items-center gap-2 ${
             toast.type === "success"
               ? "bg-green-600 text-white"
               : "bg-red-600 text-white"
@@ -219,6 +219,7 @@ export function Dashboard({ members, tasks }: DashboardProps) {
       />
 
       <MemberManager
+        open={memberManagerOpen}
         members={members}
         onAdd={handleAddMember}
         onRemove={handleRemoveMember}

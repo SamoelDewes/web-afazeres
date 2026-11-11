@@ -3,6 +3,7 @@
 import * as React from "react";
 
 interface MemberManagerProps {
+  open: boolean;
   members: Array<{ id: string; name: string }>;
   onAdd: (name: string) => Promise<void>;
   onRemove: (id: string) => Promise<void>;
@@ -10,6 +11,7 @@ interface MemberManagerProps {
 }
 
 export function MemberManager({
+  open,
   members,
   onAdd,
   onRemove,
@@ -39,6 +41,8 @@ export function MemberManager({
       return next;
     });
   };
+
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true">
