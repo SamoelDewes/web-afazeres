@@ -1,13 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { useFormStatus } from "react-dom";
 import { Input } from "@/components/input";
 import { Button } from "@/components/button";
 
 export function LoginForm() {
-  const { pending } = useFormStatus();
-
   return (
     <form className="space-y-4">
       <div className="space-y-2">
@@ -38,9 +35,9 @@ export function LoginForm() {
         />
       </div>
 
-      <button type="submit" disabled={pending} className="w-full primary lg disabled:opacity-100">
-        {pending ? "Entrando..." : "Entrar"}
-      </button>
+      <Button type="submit" variant="primary" size="lg" className="w-full">
+        Entrar
+      </Button>
     </form>
   );
 }

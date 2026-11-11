@@ -1,13 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { useFormStatus } from "react-dom";
 import { Input } from "@/components/input";
 import { Button } from "@/components/button";
 
 export function CadastroForm() {
-  const { pending } = useFormStatus();
-
   return (
     <form className="space-y-4">
       <div className="space-y-2">
@@ -39,9 +36,9 @@ export function CadastroForm() {
         />
       </div>
 
-      <button type="submit" disabled={pending} className="w-full primary lg disabled:opacity-100">
-        {pending ? "Criando..." : "Criar conta"}
-      </button>
+      <Button type="submit" variant="primary" size="lg" className="w-full">
+        Criar conta
+      </Button>
     </form>
   );
 }
