@@ -1,64 +1,11 @@
 @import "tailwindcss";
 
-:root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-
-  --indigo-dark: #3730a3;
-  --indigo-base: #4f46e5;
-  --indigo-light: #eef2ff;
-
-  --surface: #ffffff;
-  --border: #e2e8f0;
-  --muted: #64748b;
-  --muted-bg: #f1f5f9;
-
-  --success: #16a34a;
-  --success-bg: #ecfdf5;
-  --danger: #dc2626;
-  --danger-bg: #fef2f2;
-
-  --radius: 16px;
-  --shadow: 0 10px 30px -10px rgba(55, 48, 163, 0.18);
-  --shadow-sm: 0 4px 12px -4px rgba(55, 48, 163, 0.08);
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-indigo-dark: var(--indigo-dark);
-  --color-indigo-base: var(--indigo-base);
-  --color-indigo-light: var(--indigo-light);
-  --color-surface: var(--surface);
-  --color-border: var(--border);
-  --color-muted: var(--muted);
-  --color-muted-bg: var(--muted-bg);
-  --color-success: var(--success);
-  --color-success-bg: var(--success-bg);
-  --color-danger: var(--danger);
-  --color-danger-bg: var(--danger-bg);
-  --radius: var(--radius);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0b0f19;
-    --foreground: #f1f5f9;
-    --surface: #111827;
-    --border: #1e293b;
-    --muted: #94a3b8;
-    --muted-bg: #1e293b;
-    --indigo-light: #1e1b4b;
-    --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.45);
-    --shadow-sm: 0 4px 12px -4px rgba(0, 0, 0, 0.3);
-  }
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

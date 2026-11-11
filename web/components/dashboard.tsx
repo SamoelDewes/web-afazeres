@@ -21,17 +21,20 @@ export function Dashboard({ members, tasks }: DashboardProps) {
   const [taskModalOpen, setTaskModalOpen] = React.useState(false);
   const [memberManagerOpen, setMemberManagerOpen] = React.useState(false);
   const [editingTask, setEditingTask] = React.useState<Task | null>(null);
-  const [toast, setToast] = React.useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [toast, setToast] = React.useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
 
   const filteredTasks = tasks.filter((t) => t.period === period);
-  const periodLabel = period === "week" ? "desta semana" : "de final de semana";
+  const pendingCount = filteredTasks.filter((t) => !t.is_completed).length;
+  const periodLabel = period === "week" ? "desta semana" : "do final de semana";
 
   const showToast = (message: string, type: "success" | "error" = "success") => {
     setToast({ message, type });
-    setTimeout(() => setToast(null), 4000);
+    setTimeout(() => setToast(null), 3500);
   };
 
-  // toggleTask/deleteTask esperam FormData; vamos criar wrappers que chamam as actions com FormData
   const handleComplete = async (task: Task) => {
     const formData = new FormData();
     formData.append("id", task.id);
@@ -55,14 +58,10 @@ export function Dashboard({ members, tasks }: DashboardProps) {
     formData.append("name", name);
     const result = await addMember(formData);
     if (result.error) showToast(result.error, "error");
-    else {
-      showToast(result.success || "Membro adicionado.");
-      setMemberManagerOpen(false);
-    }
+    else showToast(result.success || "Membro adicionado.");
   };
 
   const handleRemoveMember = async (id: string) => {
-    if (!confirm("Remover este membro?")) return;
     const formData = new FormData();
     formData.append("id", id);
     const result = await removeMember(formData);
@@ -70,32 +69,48 @@ export function Dashboard({ members, tasks }: DashboardProps) {
     else showToast(result.success || "Membro removido.");
   };
 
+  const openNewTask = () => {
+    setEditingTask(null);
+    setTaskModalOpen(true);
+  };
+
+  const openEditTask = (task: Task) => {
+    setEditingTask(task);
+    setTaskModalOpen(true);
+  };
+
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3.5 bg-indigo-dark text-white shadow-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-xl bg-indigo-light flex items-center justify-center text-indigo-dark">
+      <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-indigo-700 text-white shadow-md shadow-indigo-900/20">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 11l3 3L22 4" />
               <path d="M22 4h-7.9a4 4 0 0 0-.566 2.826" />
               <path d="M22 4l-.7 3.887a2 2 0 0 1-.453 1.06" />
             </svg>
           </div>
-          <span className="font-bold text-lg tracking-tight">Tarefas de Casa</span>
+          <div className="leading-tight">
+            <h1 className="font-bold text-base">Tarefas de Casa</h1>
+            <p className="text-[11px] text-white/70">
+              {pendingCount} pendente{pendingCount === 1 ? "" : "s"}{" "}
+              {period === "week" ? "na semana" : "no fim de semana"}
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <button
             onClick={() => setMemberManagerOpen(true)}
-            className="p-2 rounded-xl text-white/90 hover:bg-white/10 transition-colors"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-white/90 hover:bg-white/10 transition-colors"
             aria-label="Configurações"
           >
             <Settings width="20" height="20" />
           </button>
-          <form action={logoutAction} style={{ display: "inline" }}>
+          <form action={logoutAction}>
             <button
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white/90 hover:bg-white/10 transition-colors text-sm font-medium"
+              className="flex items-center gap-1.5 min-h-[44px] px-3 rounded-xl text-white/90 hover:bg-white/10 transition-colors text-sm font-medium"
             >
               <LogOut width="16" height="16" /> Sair
             </button>
@@ -103,92 +118,102 @@ export function Dashboard({ members, tasks }: DashboardProps) {
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto px-4 pb-24 pt-2">
-        {/* Toggle período */}
-        <div className="mb-4">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-semibold text-muted uppercase tracking-wider">Período</span>
-          </div>
-          <div className="inline-flex rounded-2xl border border-border p-1 bg-surface shadow-sm">
-            <button
-              onClick={() => setPeriod("week")}
-              className={`rounded-xl px-4 py-2 text-sm font-medium transition-all ${
-                period === "week"
-                  ? "bg-indigo-dark border-indigo-dark text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-100"
-              }`}
-            >
-              Semana
-            </button>
-            <button
-              onClick={() => setPeriod("weekend")}
-              className={`rounded-xl px-4 py-2 text-sm font-medium transition-all ${
-                period === "weekend"
-                  ? "bg-indigo-dark border-indigo-dark text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-100"
-              }`}
-            >
-              Final de Semana
-            </button>
-          </div>
-        </div>
-
-        {toast && (
-          <div className="mb-4 px-4 py-3 rounded-xl border bg-success-bg border-success/20 text-success text-sm flex items-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {/* Toast */}
+      {toast && (
+        <div
+          className={`fixed left-4 right-4 top-16 z-50 mx-auto max-w-sm px-4 py-3 rounded-xl shadow-lg text-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-2 ${
+            toast.type === "success"
+              ? "bg-green-600 text-white"
+              : "bg-red-600 text-white"
+          }`}
+          role="status"
+        >
+          {toast.type === "success" ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="20 6 9 17 4 12" />
             </svg>
-            {toast.message}
-          </div>
-        )}
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          )}
+          {toast.message}
+        </div>
+      )}
+
+      <main className="flex-1 w-full max-w-lg mx-auto px-4 pt-4 pb-28">
+        {/* Toggle período — assinatura */}
+        <div className="mb-4 rounded-2xl border border-slate-200 bg-white p-1 shadow-sm grid grid-cols-2">
+          <button
+            onClick={() => setPeriod("week")}
+            className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition-all min-h-[44px] ${
+              period === "week"
+                ? "bg-indigo-700 text-white shadow"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
+          >
+            Semana
+          </button>
+          <button
+            onClick={() => setPeriod("weekend")}
+            className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition-all min-h-[44px] ${
+              period === "weekend"
+                ? "bg-indigo-700 text-white shadow"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
+          >
+            Final de Semana
+          </button>
+        </div>
 
         {/* Lista de tarefas */}
         <div className="space-y-2">
           {filteredTasks.length === 0 ? (
-            <div className="text-center py-12">
-              <svg width="48" height="48" className="mx-auto opacity-20 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-              </svg>
-              <p className="text-sm text-muted">
-                Nenhuma tarefa neste período{" "}
-                {periodLabel}.
+            <div className="text-center py-14">
+              <div className="mx-auto w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+              </div>
+              <p className="text-sm text-slate-500">
+                Nenhuma tarefa {periodLabel}.
               </p>
               <button
-                onClick={() => setTaskModalOpen(true)}
-                className="mt-4 ghost"
+                onClick={openNewTask}
+                className="mt-4 inline-flex items-center gap-1.5 rounded-xl text-indigo-700 font-medium text-sm px-4 py-2.5 min-h-[44px] hover:bg-indigo-50 transition-colors"
               >
-                <Plus width="16" height="16" className="mr-1" /> Criar primeira tarefa
+                <Plus width="16" height="16" /> Criar primeira tarefa
               </button>
             </div>
           ) : (
-            <>
-              {filteredTasks.map((task) => {
-                const assignedMembers = members.filter((m) =>
-                  task.assigneeIds?.includes(m.id)
-                );
-                return (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    members={assignedMembers}
-                    onToggle={() => handleComplete(task)}
-                    onEdit={() => setEditingTask(task)}
-                    onDelete={() => handleDelete(task)}
-                  />
-                );
-              })}
-            </>
+            filteredTasks.map((task) => {
+              const assignedMembers = members.filter((m) =>
+                (task.assigneeIds ?? []).includes(m.id)
+              );
+              return (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  members={assignedMembers}
+                  onToggle={() => handleComplete(task)}
+                  onEdit={() => openEditTask(task)}
+                  onDelete={() => handleDelete(task)}
+                />
+              );
+            })
           )}
         </div>
       </main>
 
-      <Fab onClick={() => setTaskModalOpen(true)} />
+      <Fab onClick={openNewTask} />
 
       <TaskFormModal
         open={taskModalOpen}
         onClose={() => setTaskModalOpen(false)}
-        onSuccess={() => setTaskModalOpen(false)}
+        onSuccess={() => showToast("Tarefa salva.")}
         task={editingTask ?? undefined}
         members={members}
       />
@@ -197,10 +222,6 @@ export function Dashboard({ members, tasks }: DashboardProps) {
         members={members}
         onAdd={handleAddMember}
         onRemove={handleRemoveMember}
-        adding={false}
-        newName=""
-        setNewName={() => {}}
-        removing={new Set()}
         onClose={() => setMemberManagerOpen(false)}
       />
     </div>

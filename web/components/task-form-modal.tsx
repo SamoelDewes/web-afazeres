@@ -1,9 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Button } from "@/components/button";
-import { Input } from "@/components/input";
-import { X, Plus, CheckCircle } from "lucide-react";
 import { addTask, updateTask } from "@/lib/actions/tasks";
 
 interface TaskFormModalProps {
@@ -62,56 +59,73 @@ export function TaskFormModal({
     );
   };
 
+  if (!open) return null;
+
   return (
     <div
-      className={`fixed inset-0 z-50 ${open ? "flex" : "hidden"} items-center justify-center`}
-      aria-hidden={!open}
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
       role="dialog"
       aria-modal="true"
     >
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
+      <div
+        className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
-      <div className="relative bg-surface w-full max-w-md p-5 rounded-2xl shadow-xl border border-border animate-in fade-in slide-in-from-bottom-2 duration-200">
+      <div className="relative bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl shadow-2xl border border-slate-200 p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-slate-900">
             {isEditing ? "Editar tarefa" : "Nova tarefa"}
           </h2>
-          <button onClick={onClose} className="rounded-full p-1.5 text-slate-400 hover:bg-muted-bg hover:text-slate-900 transition-colors">
-            <X width="20" height="20" />
+          <button
+            onClick={onClose}
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+            aria-label="Fechar"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="Título da tarefa"
-            placeholder="Ex: Lavar louça"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            error={error}
-            required
-          />
+          <div className="space-y-2">
+            <label htmlFor="task-title" className="block text-sm font-medium text-slate-700">
+              Título da tarefa
+            </label>
+            <input
+              id="task-title"
+              type="text"
+              placeholder="Ex: Lavar louça"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="block w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600"
+            />
+            {error && <p className="text-sm text-red-600">{error}</p>}
+          </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Período
-            </label>
+            <span className="block text-sm font-medium text-slate-700">Período</span>
             <div className="grid grid-cols-2 gap-2">
               <button
+                type="button"
                 onClick={() => setPeriod("week")}
-                className={`rounded-xl border px-3 py-2 text-sm font-medium transition-all ${
+                className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition-all min-h-[44px] ${
                   period === "week"
-                    ? "bg-indigo-dark border-indigo-dark text-white shadow-sm"
-                    : "border-border bg-surface text-slate-700 hover:bg-slate-100"
+                    ? "bg-indigo-700 border-indigo-700 text-white shadow-sm"
+                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
                 }`}
               >
                 Semana
               </button>
               <button
+                type="button"
                 onClick={() => setPeriod("weekend")}
-                className={`rounded-xl border px-3 py-2 text-sm font-medium transition-all ${
+                className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition-all min-h-[44px] ${
                   period === "weekend"
-                    ? "bg-indigo-dark border-indigo-dark text-white shadow-sm"
-                    : "border-border bg-surface text-slate-700 hover:bg-slate-100"
+                    ? "bg-indigo-700 border-indigo-700 text-white shadow-sm"
+                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
                 }`}
               >
                 Final de Semana
@@ -120,45 +134,53 @@ export function TaskFormModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+            <span className="block text-sm font-medium text-slate-700">
               Quem vai fazer?
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              {members.map((member) => (
-                <button
-                  key={member.id}
-                  type="button"
-                  onClick={() => toggleMember(member.id)}
-                  className={`rounded-xl border px-2 py-2 text-sm font-medium transition-all capitalize ${
-                    selectedMemberIds.includes(member.id)
-                      ? "bg-indigo-dark border-indigo-dark text-white shadow-sm"
-                      : "border-border bg-surface text-slate-700 hover:bg-slate-100"
-                  }`}
-                >
-                  {member.name}
-                </button>
-              ))}
-            </div>
-            {members.length === 0 && (
-              <p className="text-sm text-muted">Nenhum membro cadastrado. Adicione em Configurações.</p>
+            </span>
+            {members.length > 0 ? (
+              <div className="grid grid-cols-2 gap-2">
+                {members.map((member) => (
+                  <button
+                    key={member.id}
+                    type="button"
+                    onClick={() => toggleMember(member.id)}
+                    className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition-all min-h-[44px] flex items-center justify-between ${
+                      selectedMemberIds.includes(member.id)
+                        ? "bg-indigo-700 border-indigo-700 text-white shadow-sm"
+                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    <span className="truncate">{member.name}</span>
+                    {selectedMemberIds.includes(member.id) && (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="ml-2 shrink-0">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500">
+                Nenhum membro cadastrado. Adicione pelo menu de configurações no
+                header.
+              </p>
             )}
           </div>
 
-          <div className="mt-2 flex gap-2">
+          <div className="pt-2 flex gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 ghost"
+              className="flex-1 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium px-4 py-2.5 min-h-[48px] hover:bg-slate-50 active:scale-95 transition-all"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex-1 primary lg"
+              className="flex-1 rounded-xl bg-indigo-700 text-white font-medium px-4 py-2.5 min-h-[48px] shadow-sm hover:bg-indigo-600 active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none"
               disabled={loading || !title.trim()}
             >
               {loading ? "Salvando..." : isEditing ? "Salvar" : "Criar tarefa"}
-              <Plus width="16" height="16" className="ml-1" />
             </button>
           </div>
         </form>
