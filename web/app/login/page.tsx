@@ -34,7 +34,11 @@ export default async function LoginPage({
 
         {hasError && (
           <div className="mb-4 p-3 rounded-xl bg-danger-bg border border-danger/20 text-danger text-sm">
-            E-mail ou senha incorretos. Tente novamente.
+            {hasError === "email_not_confirmed"
+              ? "Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada (e a pasta de spam)."
+              : hasError === "invalid_credentials"
+                ? "E-mail ou senha incorretos. Tente novamente."
+                : "Não foi possível entrar. Tente novamente."}
           </div>
         )}
 
@@ -67,7 +71,8 @@ async function loginAction(formData: FormData): Promise<void> {
   });
 
   if (error) {
-    redirect("/login?error=credentials");
+    const code = error.code ?? "unknown";
+    redirect(`/login?error=${encodeURIComponent(code)}`);
   }
 
   redirect("/dashboard");

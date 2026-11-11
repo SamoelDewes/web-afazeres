@@ -4,7 +4,21 @@ import { CadastroForm } from "@/components/cadastro-form";
 
 export const dynamic = "force-dynamic";
 
-export default async function CadastroPage() {
+const MESSAGES: Record<string, string> = {
+  user_already_registered:
+    "Este e-mail já tem uma conta. Faça login ou use outro e-mail.",
+  weak_password: "A senha precisa ter pelo menos 6 caracteres.",
+  signup_disabled:
+    "O cadastro está desativado neste projeto Supabase. Ative o cadastro por e-mail em Authentication > Providers.",
+  email_exists: "Este e-mail já está cadastrado. Faça login.",
+};
+
+export default async function CadastroPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; notice?: string }>;
+}) {
+  const { error, notice } = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase.auth.getSession();
 
@@ -26,6 +40,19 @@ export default async function CadastroPage() {
           <h1 className="text-2xl font-bold text-slate-900 mb-1">Tarefas de Casa</h1>
           <p className="text-muted text-sm">Criar sua conta</p>
         </div>
+
+        {notice === "confirm_email" && (
+          <div className="mb-4 p-3 rounded-xl bg-indigo-light border border-indigo-dark/20 text-indigo-dark text-sm">
+            Conta criada! Confirme seu e-mail (verifique a caixa de entrada e o
+            spam) e depois faça login.
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-4 p-3 rounded-xl bg-danger-bg border border-danger/20 text-danger text-sm">
+            {MESSAGES[error] ?? "Não foi possível criar a conta. Tente novamente."}
+          </div>
+        )}
 
         <form action={cadastroAction} className="space-y-4">
           <CadastroForm />
@@ -50,13 +77,19 @@ async function cadastroAction(formData: FormData): Promise<void> {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
   });
 
   if (error) {
-    redirect("/cadastro?error=signup");
+    const code = error.code ?? "unknown";
+    redirect(`/cadastro?error=${encodeURIComponent(code)}`);
+  }
+
+  // Sem sessão pós-signup = confirmação de e-mail obrigatória no Supabase
+  if (!data.session) {
+    redirect("/cadastro?notice=confirm_email");
   }
 
   redirect("/dashboard");
