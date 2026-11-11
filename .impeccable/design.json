@@ -1,0 +1,32 @@
+{
+  "palette": {
+    "indigo-dark": "#3730a3",
+    "indigo-base": "#4f46e5",
+    "indigo-light": "#eef2ff",
+    "background": "#f8fafc",
+    "surface": "#ffffff",
+    "border": "#e2e8f0",
+    "foreground": "#0f172a",
+    "muted": "#64748b",
+    "muted-bg": "#f1f5f9",
+    "success": "#16a34a",
+    "success-bg": "#ecfdf5",
+    "danger": "#dc2626",
+    "danger-bg": "#fef2f2"
+  },
+  "dark": {
+    "background": "#0b0f19",
+    "surface": "#111827",
+    "border": "#1e293b",
+    "muted": "#94a3b8",
+    "muted-bg": "#1e293b",
+    "indigo-light": "#1e1b4b"
+  },
+  "radius": "16px",
+  "shadow": "0 10px 30px -10px rgba(55, 48, 163, 0.18)",
+  "shadow-sm": "0 4px 12px -4px rgba(55, 48, 163, 0.08)",
+  "font-sans": "Inter, system-ui, sans-serif",
+  "touchTarget": "44px",
+  "mode": "operate",
+  "signature": "week/weekend toggle as physical divider that re-tints the shell and reorders/filter the list"
+}
